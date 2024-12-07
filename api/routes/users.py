@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from ..schemas import User, db, UserResponse
 from ..utils import get_password_hash
+from datetime import datetime
 
 import secrets
 
@@ -16,9 +17,23 @@ def get():
         "message": "Hello World"
     }
 
+def read_root():
+    content = {"timestamp": datetime.now()}
+    json_compatible_content = jsonable_encoder(content)
+    return json_compatible_content
+
+
 @router.post("/registration", response_description = "Register a user", response_model = UserResponse)
 async def registration(user_info: User):
+
+    timestamp = {"created_at": datetime.now(), "updated_at": datetime.now()}
+
+    # Change data in JSON
+    json_timestamp = jsonable_encoder(timestamp)
     user_info = jsonable_encoder(user_info)
+
+    # Merging JSON objects
+    user_info = {**user_info, **json_timestamp}
 
     # Check for duplication
     username_found = await db["users"].find_one({"name": user_info["name"]})
