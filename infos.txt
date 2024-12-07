@@ -1,0 +1,34 @@
+Install venv
+    python3 -m venv venv
+
+Activate venv
+    source venv/bin/activate
+
+Install FastAPI
+    pip install fastapi
+
+Install Uvicorn
+    pip install "uvicorn[standard]"
+
+Credentials
+    usr : kodjoboaz
+    pwd : 9fKKHrG1eLxJN1Bt
+
+MongoDB Connector
+    pip install pymongo
+    pip install "pymongo[srv]" # Optional
+
+Python DotEnv
+    pip install python-dotenv
+
+Motor library
+    pip install motor
+
+Pydantic Email validator
+    pip install "pydantic[email]"
+
+Password hash library
+    pip install "passlib[bcrypt]"
+
+Run the server with Uvicorn
+    uvicorn api.main:app --reload
