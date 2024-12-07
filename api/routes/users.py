@@ -17,12 +17,6 @@ def get():
         "message": "Hello World"
     }
 
-def read_root():
-    content = {"timestamp": datetime.now()}
-    json_compatible_content = jsonable_encoder(content)
-    return json_compatible_content
-
-
 @router.post("/registration", response_description = "Register a user", response_model = UserResponse)
 async def registration(user_info: User):
 
