@@ -19,7 +19,7 @@ def get():
 
 @router.post("/registration", response_description = "Register a user", response_model = UserResponse)
 async def registration(user_info: User):
-
+    # Get current time
     timestamp = {"created_at": datetime.now(), "updated_at": datetime.now()}
 
     # Change data in JSON
