@@ -57,6 +57,7 @@ async def registration(user_info: User):
     new_user = await db["users"].insert_one(user_info)
     created_user = await db["users"].find_one({"_id" : new_user.inserted_id})
 
+    # Send email to the user after registration
     await send_registration_email("Registratoin successful", user_info["email"], {
         "title" : "Registration Successfuly",
         "name" : user_info["name"]
