@@ -66,7 +66,7 @@ class User(BaseModel):
             "example" : {
                 "name": "John Doe",
                 "email": "jdoe@example.com",
-                "password": "secret_password"
+                "password": "s3cRet_password"
             }
         }
 

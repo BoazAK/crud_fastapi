@@ -1,8 +1,10 @@
 from fastapi import APIRouter, HTTPException, status
 from fastapi.encoders import jsonable_encoder
+from pydantic import ValidationError, validate_call
 from ..schemas import User, db, UserResponse
 from ..utils import get_password_hash
 from datetime import datetime
+from ..send_email import send_registration_email
 
 import secrets
 
@@ -55,6 +57,9 @@ async def registration(user_info: User):
     new_user = await db["users"].insert_one(user_info)
     created_user = await db["users"].find_one({"_id" : new_user.inserted_id})
 
-    # Send the email to the user
+    await send_registration_email("Registratoin successful", user_info["email"], {
+        "title" : "Registration Successfuly",
+        "name" : user_info["name"]
+    })
     
     return created_user

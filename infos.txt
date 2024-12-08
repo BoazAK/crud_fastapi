@@ -14,6 +14,20 @@ Credentials
     usr : kodjoboaz
     pwd : 9fKKHrG1eLxJN1Bt
 
+Example project on GitHub :
+    https://github.com/Princekrampah/Mongodb_fastapi_blog_API
+
+Hostinger server configuration
+    Incoming server (IMAP)
+        imap.hostinger.com
+        993
+        SSL
+
+    Outgoing server (SMTP)
+        smtp.hostinger.com
+        Port : 465
+        SSL
+
 MongoDB Connector
     pip install pymongo
     pip install "pymongo[srv]" # Optional
@@ -29,6 +43,12 @@ Pydantic Email validator
 
 Password hash library
     pip install "passlib[bcrypt]"
+
+FastAPI Email sender module
+    pip install fastapi-mail
+
+Python MultiPart module
+    pip install python-multipart
 
 Run the server with Uvicorn
     uvicorn api.main:app --reload
