@@ -76,9 +76,13 @@ async def get_blog(id : str):
 # Update a blog
 @router.put("/{id}", response_description = "Update blog content", response_model = BlogContentResponse)
 async def update_blog(id : str, blog_content : BlogContent, current_user = Depends(oauth2.get_current_user)):
+
     if blog_post := await db["blogPost"].find_one({"_id" : id}) :
+
         if blog_post["author_id"] == current_user["_id"] :
+
             try :
+
                 blog_content = {k : v for k, v in blog_content.model_dump().items() if v is not None}
 
                 if len(blog_content) >=1 :
@@ -110,6 +114,7 @@ async def update_blog(id : str, blog_content : BlogContent, current_user = Depen
                     )
             
             except Exception as e :
+
                 print(e)
                 raise HTTPException(
                     status_code = status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -117,12 +122,58 @@ async def update_blog(id : str, blog_content : BlogContent, current_user = Depen
                 )
             
         else :
+
             raise HTTPException(
                 status_code = status.HTTP_401_UNAUTHORIZED,
                 detail = "You are not the author of this blog post"
             )
         
     else :
+
+        raise HTTPException(
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = "Blog with this ID not found"
+        )
+
+# Delete a blog
+@router.delete("/{id}", response_description = "Delete blog content")
+async def delete_blog_post(id : str, current_user = Depends(oauth2.get_current_user)):
+    
+    if blog_post := await db["blogPost"].find_one({"_id" : id}) :
+
+        if blog_post["author_id"] == current_user["_id"]:
+
+            try :
+
+                delete_result = await db["blogPost"].delete_one({"_id" : id})
+                
+                if delete_result.deleted_count == 1 :
+                    
+                    return HTTPException(
+                        status_code = status.HTTP_204_NO_CONTENT,
+                    )
+                
+                raise HTTPException(
+                    status_code = status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail = "Internal server error"
+                )
+
+            except Exception as e :
+
+                print(e)
+                raise HTTPException(
+                    status_code = status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail = "Internal server error"
+                )
+        
+        else :
+
+            raise HTTPException(
+                status_code = status.HTTP_401_UNAUTHORIZED,
+                detail = "You are not the author of this blog post"
+            )
+    else :
+
         raise HTTPException(
             status_code = status.HTTP_404_NOT_FOUND,
             detail = "Blog with this ID not found"
