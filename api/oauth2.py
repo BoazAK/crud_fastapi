@@ -17,10 +17,13 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
-def create_access_token(payload : dict) :
+def create_access_token(payload : dict, timestamp : int) :
     to_encode = payload.copy()
 
-    expiration_time = datetime.now(timezone.utc) + timedelta(minutes = ACCESS_TOKEN_EXPIRE_MINUTES )
+    if timestamp :
+        expiration_time = datetime.now(timezone.utc) + timedelta(minutes = timestamp )
+    else :
+        expiration_time = datetime.now(timezone.utc) + timedelta(minutes = ACCESS_TOKEN_EXPIRE_MINUTES )
 
     to_encode.update({"exp" : expiration_time})
 

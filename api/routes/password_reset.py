@@ -16,7 +16,7 @@ async def reset_request(user_email : PasswordReset) :
     user = await db["users"].find_one({"email" : user_email.email})
 
     if user is not None :
-        token = create_access_token({"id" : user["_id"]})
+        token = create_access_token({"id" : user["_id"]}, 5)
 
         # Local link for password reset
         reset_link = f"http://127.0.0.1:8000/?token={token}"
