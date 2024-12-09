@@ -105,3 +105,8 @@ class UserResponse(BaseModel):
         json_schema.update(type = "string")
         
         return json_schema
+    
+
+class TokenData(BaseModel):
+    id : str
+    
