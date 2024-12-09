@@ -13,14 +13,14 @@ router = APIRouter(
 )
 
 @router.get("/")
-def get():
+def get() :
     return {
         "status": "OK",
         "message": "Hello World"
     }
 
 @router.post("/registration", response_description = "Register a user", response_model = UserResponse)
-async def registration(user_info: User):
+async def registration(user_info: User) :
     # Get current time
     timestamp = {"created_at": datetime.now(), "updated_at": datetime.now()}
 
@@ -31,21 +31,26 @@ async def registration(user_info: User):
     # Merging JSON objects
     user_info = {**user_info, **json_timestamp}
 
-    # Check for duplication
-    username_found = await db["users"].find_one({"name": user_info["name"]})
-    email_found = await db["users"].find_one({"email": user_info["email"]})
+    # Find user by username or by email
+    user_found = await db["users"].find_one({
+        "$or": [
+            {"name": user_info["name"]},
+            {"email": user_info["email"]}
+        ]
+    })
 
-    if username_found:
-        raise HTTPException(
-            status_code = status.HTTP_409_CONFLICT,
-            detail = "Username is already taken"
-        )
-    
-    if email_found:
-        raise HTTPException(
-            status_code = status.HTTP_409_CONFLICT,
-            detail = "Email is already taken"
-        )
+    # Raise error if user exist
+    if user_found :
+        if user_found.get("name") == user_info["name"] :
+            raise HTTPException(
+                status_code = status.HTTP_409_CONFLICT,
+                detail = "Username is already taken"
+            )
+        if user_found.get("email") == user_info["email"] :
+            raise HTTPException(
+                status_code = status.HTTP_409_CONFLICT,
+                detail = "Email is already taken"
+            )
     
     # Hash user's passowrd
     user_info["password"] = get_password_hash(user_info["password"])

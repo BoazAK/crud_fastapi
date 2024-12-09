@@ -50,5 +50,8 @@ FastAPI Email sender module
 Python MultiPart module
     pip install python-multipart
 
+PyJWT to generate and verify the JWT tokens in Python
+    pip install pyjwt
+
 Run the server with Uvicorn
     uvicorn api.main:app --reload
