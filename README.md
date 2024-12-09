@@ -3,5 +3,5 @@
 ## To Do
 - [x] Add created at and updated at to the users creations
 - [ ] (OPTIONAL) Work on this error which raise when I try to register an user "AttributeError: module 'bcrypt' has no attribute '__about__'"
-- [ ] Test NoSQL injection on the login with Burp Suite
+- [x] (Not vulnerable) Test NoSQL injection on the login with Burp Suite
 - [ ] 
