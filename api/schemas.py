@@ -145,6 +145,7 @@ class BlogContentResponse(BaseModel):
                 "author_id" : "ID of the author",
                 "created_at" : "Date blog created",
                 "published_at" : "Date blog published",
+                "unpublished_at" : "Date blog unpublished",
                 "updated_at" : "Date blog updated"
             }
         }

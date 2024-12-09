@@ -51,6 +51,39 @@ async def get_blogs(limit : int = 10, order_by : str = "created_at"):
             detail = "Internal server error"
         )
     
+# Get all unpublished posts limit to 10 per page and order by created date by user
+@router.get("/unpublished", response_description = "Get unpublished blogs content", response_model = List[BlogContentResponse])
+async def get_unpublished_blogs(limit : int = 10, order_by : str = "created_at", current_user = Depends(oauth2.get_current_user)):
+
+    if blog_posts := await db["blogPost"].find({"status": False}).sort(order_by, -1).to_list(limit) :
+
+        result = []
+    
+        for post in blog_posts:
+
+            if post["author_id"] == current_user["_id"]:
+                
+                author_details = await db["users"].find_one({"_id": post["author_id"]})
+                post["author"] = author_details
+                
+                result.append(post)
+            else:
+
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="You cannot access posts that you do not own."
+                )
+
+        return result
+        
+    else :
+
+        raise HTTPException(
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail = "Internal server error"
+        )
+        
+    
 # Get one blog
 @router.get("/{id}", response_description = "Get blog content", response_model = BlogContentResponse)
 async def get_blog(id : str):
