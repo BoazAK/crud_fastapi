@@ -127,6 +127,7 @@ class BlogContentResponse(BaseModel):
     title : str = Field(...)
     body : str = Field(...)
     status : bool
+    published_at : str = Field(...)
     author_name : str = Field(...)
     author_id : str = Field(...)
     created_at : str = Field(...)

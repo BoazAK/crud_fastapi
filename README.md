@@ -7,8 +7,9 @@
 - [ ] Add expire after one usage to the reset password token
 - [x] Add status to blog (published and not published) (False = not published)
 - [x] Get one and all blog post by published status (When status = True)
-- [x] Get all un published post by user (user must be authenticated)
-- [ ] Add of status change function
+- [x] Get all unpublished post by user (user must be authenticated)
+- [x] Add function to publish blog post
+- [ ] Add function to unpublish blog post
 - [ ] Add timestamp for blog status change (published and unpublished)
 - [ ] Change blog hard delete to soft delete
 - [ ] Add timestamp for blog delete
