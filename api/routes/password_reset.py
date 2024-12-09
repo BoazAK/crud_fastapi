@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from fastapi import APIRouter, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from api.schemas import UserResponse, db, NewPassword, PasswordReset
@@ -55,7 +55,7 @@ async def reset(token : str, new_password : NewPassword) :
         user = await get_current_user(token)
 
         # Get current time
-        timestamp = {"last_pwd_changed_date" : datetime.datetime.today()}
+        timestamp = {"last_pwd_changed_date" : datetime.today()}
         
         # Change data in JSON
         json_timestamp = jsonable_encoder(timestamp)
