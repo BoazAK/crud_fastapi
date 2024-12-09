@@ -28,27 +28,34 @@ def create_access_token(payload : dict) :
 
     return jwt_token
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) :
-    credentials_exception = HTTPException(
-        status_code = status.HTTP_401_UNAUTHORIZED,
-        detail = "Could not validate token",
-        headers = {"WWW-Authenticate": "Bearer"},
-    )
-        
+def verify_access_token(token: str, credentials_exception):
     try :
+        # Decode Token
         payload = jwt.decode(token, key = SECRET_KEY, algorithms = ALGORITHM)
-        user_id : str = payload.get("_id")
+        # Get user ID
+        user_id : str = payload.get("id")
+
         if not user_id : # Same as if user_id is None
             raise credentials_exception
         
         token_data = TokenData(id=user_id)
 
+        return token_data
+
     except InvalidTokenError :
         raise credentials_exception
-    
-    current_user = await db["user"].find_one({"_id" : token_data.id})
 
-    if current_user is None :
-        raise credentials_exception
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) :
+    credentials_exception = HTTPException(
+        status_code = status.HTTP_401_UNAUTHORIZED,
+        detail = "Could not validate token, or token expired",
+        headers = {"WWW-Authenticate": "Bearer"},
+    )
+    
+    # Get current user ID
+    current_user_id = verify_access_token(token, credentials_exception).id
+
+    # Get current user
+    current_user = await db["users"].find_one({"_id" : current_user_id})
     
     return current_user

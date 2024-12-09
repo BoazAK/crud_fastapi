@@ -106,7 +106,16 @@ class UserResponse(BaseModel):
         
         return json_schema
     
-
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+    
 class TokenData(BaseModel):
     id : str
+
+class PasswordReset(BaseModel):
+    email : EmailStr = Field(...)
+
+class NewPassword(BaseModel):
+    password : str = Field(...)
     
