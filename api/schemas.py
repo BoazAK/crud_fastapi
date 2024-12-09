@@ -126,6 +126,7 @@ class BlogContentResponse(BaseModel):
     id: str = Field(default_factory = lambda: uuid4().hex, alias = "_id")
     title : str = Field(...)
     body : str = Field(...)
+    status : bool
     author_name : str = Field(...)
     author_id : str = Field(...)
     created_at : str = Field(...)
@@ -139,9 +140,11 @@ class BlogContentResponse(BaseModel):
             "example" : {
                 "title": "Blog title",
                 "body": "Blog content",
+                "status" : "Blog published status",
                 "author_name" : "Name of the author",
                 "author_id" : "ID of the author",
                 "created_at" : "Date blog created",
+                "published_at" : "Date blog published",
                 "updated_at" : "Date blog updated"
             }
         }

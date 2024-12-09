@@ -20,6 +20,7 @@ async def create_blog(blog_content : BlogContent, current_user = Depends(oauth2.
         blog_content["author_name"] = current_user["name"]
         blog_content["author_id"] = current_user["_id"]
         blog_content["created_at"] = blog_content["updated_at"] = str(datetime.now(timezone.utc))
+        blog_content["status"] = False
 
         new_blog_content = await db["blogPost"].insert_one(blog_content)
 
@@ -39,7 +40,7 @@ async def create_blog(blog_content : BlogContent, current_user = Depends(oauth2.
 async def get_blogs(limit : int = 10, order_by : str = "created_at"):
 
     try :
-        blog_posts = await db["blogPost"].find({"$query" : {}, "$orderby" : {order_by : -1}}).to_list(limit)
+        blog_posts = await db["blogPost"].find({"status": True}).sort(order_by, -1).to_list(limit)
 
         return blog_posts
     
@@ -55,7 +56,7 @@ async def get_blogs(limit : int = 10, order_by : str = "created_at"):
 async def get_blog(id : str):
 
     try :
-        blog_post = await db["blogPost"].find_one({"_id" : id})
+        blog_post = await db["blogPost"].find_one({"_id" : id, "status" : True})
 
         if blog_post is None :
 
