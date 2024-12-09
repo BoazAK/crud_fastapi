@@ -9,7 +9,7 @@
 - [x] Get one and all blog post by published status (When status = True)
 - [x] Get all unpublished post by user (user must be authenticated)
 - [x] Add function to publish blog post
-- [ ] Add function to unpublish blog post
-- [ ] Add timestamp for blog status change (published and unpublished)
+- [x] Add function to unpublish blog post
+- [x] Add timestamp for blog status change (published and unpublished)
 - [ ] Change blog hard delete to soft delete
 - [ ] Add timestamp for blog delete
