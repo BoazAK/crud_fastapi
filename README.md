@@ -7,4 +7,5 @@
 - [ ] Add expire after one usage to the reset password token
 - [ ] Add status to blog (published and not published)
 - [ ] Add timestamp for blog status change
-- [ ] 
+- [ ] Change blog hard delete to soft delete
+- [ ] Add timestamp for blog delete
