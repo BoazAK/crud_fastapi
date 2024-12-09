@@ -103,43 +103,52 @@ async def unpublish_blog(id : str, current_user = Depends(oauth2.get_current_use
 
         if blog_post["author_id"] == current_user["_id"] :
 
-            try :
+            if blog_post["status"] == False :
 
-                # Get current time
-                timestamp = {"unpublished_at" : datetime.today()}
-                post_status = {"status" : False}
-
-                # Change data in JSON
-                json_timestamp = jsonable_encoder(timestamp)
-                json_post_status = jsonable_encoder(post_status)
-
-                # Merging JSON objects
-                blog_post = {**blog_post, **json_timestamp, **json_post_status}
-
-                update_result = await db["blogPost"].update_one({"_id" : id}, {"$set" : blog_post})
-
-                if update_result.modified_count == 1 :
-
-                    if (updated_blog_post := await db["blogPost"].find_one({"_id" : id })) is not None :
-
-                        return updated_blog_post
-
-                if (existing_blog_post := await db["blogPost"].findo_one({"_id" : id})) is not None :
-
-                    return existing_blog_post
-                
                 raise HTTPException(
-                    status_code = status.HTTP_404_NOT_FOUND,
-                    detal = "Blog with this ID not found"
+                    status_code = status.HTTP_304_NOT_MODIFIED,
+                    detail = "Blog post is not published yet"
                 )
             
-            except Exception as e :
+            elif blog_post["status"] == True :
 
-                print(e)
-                raise HTTPException(
-                    status_code = status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail = "Internal server error"
-                )
+                try :
+
+                    # Get current time
+                    timestamp = {"unpublished_at" : datetime.today()}
+                    post_status = {"status" : False}
+
+                    # Change data in JSON
+                    json_timestamp = jsonable_encoder(timestamp)
+                    json_post_status = jsonable_encoder(post_status)
+
+                    # Merging JSON objects
+                    blog_post = {**blog_post, **json_timestamp, **json_post_status}
+
+                    update_result = await db["blogPost"].update_one({"_id" : id}, {"$set" : blog_post})
+
+                    if update_result.modified_count == 1 :
+
+                        if (updated_blog_post := await db["blogPost"].find_one({"_id" : id })) is not None :
+
+                            return updated_blog_post
+
+                    if (existing_blog_post := await db["blogPost"].findo_one({"_id" : id})) is not None :
+
+                        return existing_blog_post
+                    
+                    raise HTTPException(
+                        status_code = status.HTTP_404_NOT_FOUND,
+                        detal = "Blog with this ID not found"
+                    )
+            
+                except Exception as e :
+
+                    print(e)
+                    raise HTTPException(
+                        status_code = status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        detail = "Internal server error"
+                    )
             
         else :
 
