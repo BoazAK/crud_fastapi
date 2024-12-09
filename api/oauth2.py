@@ -17,7 +17,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 
-def create_access_token(payload : dict, timestamp : int) :
+def create_access_token(payload : dict, timestamp : int = None) :
     to_encode = payload.copy()
 
     if timestamp :
