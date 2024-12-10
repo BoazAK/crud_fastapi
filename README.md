@@ -13,4 +13,9 @@
 - [x] Add timestamp for blog status change (published and unpublished)
 - [x] Change blog hard delete to soft delete
 - [x] Add timestamp for blog delete
-- [ ] Get all soft deleted post
+- [x] Get all soft deleted posts
+
+
+
+- [ ] Add admin account creation
+- [ ] Only admins can see soft deleted posts
