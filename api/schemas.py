@@ -1,7 +1,7 @@
 import motor.motor_asyncio
 from dotenv import load_dotenv
 from bson import ObjectId
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 from pydantic_core import CoreSchema
 from pydantic import BaseModel, Field, EmailStr, GetJsonSchemaHandler, field_validator
 from uuid import uuid4
@@ -127,12 +127,14 @@ class BlogContentResponse(BaseModel):
     title : str = Field(...)
     body : str = Field(...)
     status : bool
-    published_at : str = Field(...)
-    # unpublished_at : str = Field(...)
+    published_at : Optional[str] = None
+    unpublished_at : Optional[str] = None
     author_name : str = Field(...)
     author_id : str = Field(...)
     created_at : str = Field(...)
-    updated_at : str = Field(...)
+    updated_at : Optional[str] = None
+    delete_status : bool
+    deleted_at : Optional[str] = None
 
     class Config :
         allowed_population_by_field_name = True
@@ -148,7 +150,9 @@ class BlogContentResponse(BaseModel):
                 "created_at" : "Date blog created",
                 "published_at" : "Date blog published",
                 "unpublished_at" : "Date blog unpublished",
-                "updated_at" : "Date blog updated"
+                "updated_at" : "Date blog updated",
+                "delete_status" : "Blog deletion status",
+                "deleted_at" : "Blog deletion date"
             }
         }
     

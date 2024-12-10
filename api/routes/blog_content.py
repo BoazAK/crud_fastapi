@@ -19,8 +19,8 @@ async def create_blog(blog_content : BlogContent, current_user = Depends(oauth2.
         # Add additional informations
         blog_content["author_name"] = current_user["name"]
         blog_content["author_id"] = current_user["_id"]
-        blog_content["created_at"] = blog_content["updated_at"] = str(datetime.now(timezone.utc))
-        blog_content["status"] = False
+        blog_content["created_at"] = str(datetime.now(timezone.utc))
+        blog_content["status"] = blog_content["delete_status"] = False
 
         new_blog_content = await db["blogPost"].insert_one(blog_content)
 
@@ -39,7 +39,7 @@ async def create_blog(blog_content : BlogContent, current_user = Depends(oauth2.
 @router.put("/publish/{id}", response_description = "Publish blog content", response_model = BlogContentResponse)
 async def publish_blog(id : str, current_user = Depends(oauth2.get_current_user)):
 
-    if blog_post := await db["blogPost"].find_one({"_id" : id}) :
+    if blog_post := await db["blogPost"].find_one({"_id" : id, "delete_status" : False}) :
 
         if blog_post["author_id"] == current_user["_id"] :
 
@@ -64,7 +64,7 @@ async def publish_blog(id : str, current_user = Depends(oauth2.get_current_user)
 
                         return updated_blog_post
 
-                if (existing_blog_post := await db["blogPost"].findo_one({"_id" : id})) is not None :
+                if (existing_blog_post := await db["blogPost"].find_one({"_id" : id})) is not None :
 
                     return existing_blog_post
                 
@@ -99,7 +99,7 @@ async def publish_blog(id : str, current_user = Depends(oauth2.get_current_user)
 @router.put("/unpublish/{id}", response_description = "Publish blog content", response_model = BlogContentResponse)
 async def unpublish_blog(id : str, current_user = Depends(oauth2.get_current_user)):
 
-    if blog_post := await db["blogPost"].find_one({"_id" : id}) :
+    if blog_post := await db["blogPost"].find_one({"_id" : id, "delete_status" : False}) :
 
         if blog_post["author_id"] == current_user["_id"] :
 
@@ -107,7 +107,7 @@ async def unpublish_blog(id : str, current_user = Depends(oauth2.get_current_use
 
                 raise HTTPException(
                     status_code = status.HTTP_304_NOT_MODIFIED,
-                    detail = "Blog post is not published yet"
+                    detail = "Blog post is already published"
                 )
             
             elif blog_post["status"] == True :
@@ -133,7 +133,7 @@ async def unpublish_blog(id : str, current_user = Depends(oauth2.get_current_use
 
                             return updated_blog_post
 
-                    if (existing_blog_post := await db["blogPost"].findo_one({"_id" : id})) is not None :
+                    if (existing_blog_post := await db["blogPost"].find_one({"_id" : id})) is not None :
 
                         return existing_blog_post
                     
@@ -169,7 +169,7 @@ async def unpublish_blog(id : str, current_user = Depends(oauth2.get_current_use
 async def get_blogs(limit : int = 10, order_by : str = "created_at"):
 
     try :
-        blog_posts = await db["blogPost"].find({"status": True}).sort(order_by, -1).to_list(limit)
+        blog_posts = await db["blogPost"].find({"status" : True, "delete_status" : False}).sort(order_by, -1).to_list(limit)
 
         return blog_posts
     
@@ -184,7 +184,7 @@ async def get_blogs(limit : int = 10, order_by : str = "created_at"):
 @router.get("/unpublished", response_description = "Get unpublished blogs content", response_model = List[BlogContentResponse])
 async def get_unpublished_blogs(limit : int = 10, order_by : str = "created_at", current_user = Depends(oauth2.get_current_user)):
 
-    if blog_posts := await db["blogPost"].find({"status": False}).sort(order_by, -1).to_list(limit) :
+    if blog_posts := await db["blogPost"].find({"status": False, "delete_status" : False}).sort(order_by, -1).to_list(limit) :
 
         result = []
     
@@ -212,13 +212,12 @@ async def get_unpublished_blogs(limit : int = 10, order_by : str = "created_at",
             detail = "Internal server error"
         )
         
-    
 # Get one blog
 @router.get("/{id}", response_description = "Get blog content", response_model = BlogContentResponse)
 async def get_blog(id : str):
 
     try :
-        blog_post = await db["blogPost"].find_one({"_id" : id, "status" : True})
+        blog_post = await db["blogPost"].find_one({"_id" : id, "status" : True, "delete_status" : False})
 
         if blog_post is None :
 
@@ -240,7 +239,7 @@ async def get_blog(id : str):
 @router.put("/{id}", response_description = "Update blog content", response_model = BlogContentResponse)
 async def update_blog(id : str, blog_content : BlogContent, current_user = Depends(oauth2.get_current_user)):
 
-    if blog_post := await db["blogPost"].find_one({"_id" : id}) :
+    if blog_post := await db["blogPost"].find_one({"_id" : id, "delete_status" : False}) :
 
         if blog_post["author_id"] == current_user["_id"] :
 
@@ -267,7 +266,7 @@ async def update_blog(id : str, blog_content : BlogContent, current_user = Depen
 
                             return updated_blog_post
 
-                    if (existing_blog_post := await db["blogPost"].findo_one({"_id" : id})) is not None :
+                    if (existing_blog_post := await db["blogPost"].find_one({"_id" : id})) is not None :
 
                         return existing_blog_post
                     
@@ -297,10 +296,79 @@ async def update_blog(id : str, blog_content : BlogContent, current_user = Depen
             status_code = status.HTTP_404_NOT_FOUND,
             detail = "Blog with this ID not found"
         )
+    
+# Publish a blog
+@router.put("/delete/{id}", response_description = "Delete blog content")
+async def delete_blog(id : str, current_user = Depends(oauth2.get_current_user)):
 
-# Delete a blog
-@router.delete("/{id}", response_description = "Delete blog content")
-async def delete_blog_post(id : str, current_user = Depends(oauth2.get_current_user)):
+    if blog_post := await db["blogPost"].find_one({"_id" : id, "delete_status" : False}) :
+
+        if blog_post["author_id"] == current_user["_id"] :
+
+            if blog_post["delete_status"] == True :
+
+                raise HTTPException(
+                    status_code = status.HTTP_304_NOT_MODIFIED,
+                    detail = "Blog post is already deleted"
+                )
+            
+            elif blog_post["delete_status"] == False :
+
+                try :
+
+                    # Get current time
+                    timestamp = {"deleted_at" : datetime.today()}
+                    post_status = {"delete_status" : True}
+
+                    # Change data in JSON
+                    json_timestamp = jsonable_encoder(timestamp)
+                    json_post_status = jsonable_encoder(post_status)
+
+                    # Merging JSON objects
+                    blog_post = {**blog_post, **json_timestamp, **json_post_status}
+
+                    update_result = await db["blogPost"].update_one({"_id" : id}, {"$set" : blog_post})
+
+                    if update_result.modified_count == 1 :
+
+                        if (updated_blog_post := await db["blogPost"].find_one({"_id" : id })) is not None :
+
+                            return updated_blog_post
+
+                    if (existing_blog_post := await db["blogPost"].find_one({"_id" : id})) is not None :
+
+                        return existing_blog_post
+                    
+                    raise HTTPException(
+                        status_code = status.HTTP_404_NOT_FOUND,
+                        detal = "Blog with this ID not found"
+                    )
+            
+                except Exception as e :
+
+                    print(e)
+                    raise HTTPException(
+                        status_code = status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        detail = "Internal server error"
+                    )
+            
+        else :
+
+            raise HTTPException(
+                status_code = status.HTTP_401_UNAUTHORIZED,
+                detail = "You are not the author of this blog post"
+            )
+        
+    else :
+
+        raise HTTPException(
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = "Blog with this ID not found"
+        )
+
+# Hard Delete a blog
+@router.delete("/hard_delete/{id}", response_description = "Hard Delete blog content")
+async def hard_delete_blog_post(id : str, current_user = Depends(oauth2.get_current_user)):
     
     if blog_post := await db["blogPost"].find_one({"_id" : id}) :
 

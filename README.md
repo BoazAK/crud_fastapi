@@ -11,5 +11,6 @@
 - [x] Add function to publish blog post
 - [x] Add function to unpublish blog post
 - [x] Add timestamp for blog status change (published and unpublished)
-- [ ] Change blog hard delete to soft delete
-- [ ] Add timestamp for blog delete
+- [x] Change blog hard delete to soft delete
+- [x] Add timestamp for blog delete
+- [ ] Get all soft deleted post
