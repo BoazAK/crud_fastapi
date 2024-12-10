@@ -14,8 +14,11 @@ Credentials
     usr : kodjoboaz
     pwd : 9fKKHrG1eLxJN1Bt
 
-Example project on GitHub :
-    https://github.com/Princekrampah/Mongodb_fastapi_blog_API
+Example project with deploiement with Docker on Heroku
+    - GitHub :
+        https://github.com/Princekrampah/Mongodb_fastapi_blog_API
+    - Youtube :
+        https://www.youtube.com/watch?v=XbVUF1IVX8Y&list=PLU7aW4OZeUzxL1wZVOS31LfbB1VNL3MeX&ab_channel=CodeWithPrince
 
 Hostinger server configuration
     Incoming server (IMAP)
