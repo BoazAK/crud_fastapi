@@ -14,7 +14,7 @@ Credentials
     usr : kodjoboaz
     pwd : 9fKKHrG1eLxJN1Bt
 
-Example project with deploiement with Docker on Heroku
+Example project with deploiement with CI/CD GitHub action by Docker on Heroku
     - GitHub :
         https://github.com/Princekrampah/Mongodb_fastapi_blog_API
     - Youtube :
