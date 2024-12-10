@@ -217,27 +217,29 @@ async def get_unpublished_blogs(limit : int = 10, order_by : str = "created_at",
 async def get_deleted_blogs(limit : int = 10, order_by : str = "deleted_at", current_user = Depends(oauth2.get_current_user)):
 
     try:
-        # Récupère les posts supprimés avec un tri par date et une limite de résultats
-        blog_posts = await db["blogPost"].find({"delete_status": True}).sort(order_by, -1).to_list(limit)
         
-        if not blog_posts:
+        blog_posts = await db["blogPost"].find({"delete_status" : True}).sort(order_by, -1).to_list(limit)
+        
+        if not blog_posts :
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="No deleted posts found."
+                status_code = status.HTTP_404_NOT_FOUND,
+                detail = "No deleted posts found."
             )
 
         result = []
 
-        for post in blog_posts:
-            # Vérifie si l'utilisateur est bien l'auteur
+        for post in blog_posts :
+            
             if str(post["author_id"]) == str(current_user["_id"]):
-                # Récupère les détails de l'auteur si nécessaire
+                
                 author_details = await db["users"].find_one({"_id": post["author_id"]})
                 post["author"] = author_details
 
-                # Valide le post avec BlogContentResponse et ajoute à la liste des résultats
+                
                 result.append(BlogContentResponse(**post))
-            else:
+
+            else :
+                
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="You cannot access posts that you do not own."
@@ -245,8 +247,10 @@ async def get_deleted_blogs(limit : int = 10, order_by : str = "deleted_at", cur
 
         return result
 
-    except Exception as e:
+    except Exception as e :
+
         print(f"Error occurred: {e}")
+        
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Internal server error: {str(e)}"
